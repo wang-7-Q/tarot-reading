@@ -19,7 +19,8 @@ export default function HomePage() {
     try {
       const result = await recommendSpreads(question);
       navigate('/recommend', { state: { recommendations: result } });
-    } catch {
+    } catch (err) {
+      console.error('Recommend failed:', err);
       setError('无法连接到服务器，请确保后端已启动');
     } finally {
       setIsLoading(false);

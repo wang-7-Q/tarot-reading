@@ -21,33 +21,45 @@ export default function DrawPage() {
   const spread = session.spread;
 
   useEffect(() => {
+    let cancelled = false;
     if (!spread) {
       navigate('/');
       return;
     }
     drawCards(spread.id, spread.card_count)
       .then(result => {
+        if (cancelled) return;
         setAvailableCards(result.cards);
         setDrawn(new Array(spread.card_count).fill(null));
       })
-      .catch(() => setError('加载牌堆失败'));
+      .catch((err) => {
+        if (cancelled) return;
+        console.error('Load cards failed:', err);
+        setError('加载牌堆失败');
+      });
+    return () => { cancelled = true; };
   }, [spread, navigate]);
 
   const handleShuffle = useCallback(() => {
+    let cancelled = false;
     setIsShuffling(true);
     if (spread) {
       drawCards(spread.id, spread.card_count)
         .then(result => {
+          if (cancelled) return;
           setAvailableCards(result.cards);
           setDrawn(new Array(spread.card_count).fill(null));
           setRevealed(new Set());
           setIsShuffling(false);
         })
-        .catch(() => {
+        .catch((err) => {
+          if (cancelled) return;
+          console.error('Shuffle failed:', err);
           setError('洗牌失败');
           setIsShuffling(false);
         });
     }
+    return () => { cancelled = true; };
   }, [spread]);
 
   const handleDraw = useCallback(() => {
@@ -91,7 +103,8 @@ export default function DrawPage() {
       );
       setInterpretation(result);
       navigate('/interpret');
-    } catch {
+    } catch (err) {
+      console.error('Interpret failed:', err);
       setError('AI 解读请求失败，请确保 ANTHROPIC_API_KEY 已配置且后端已启动');
     } finally {
       setIsInterpreting(false);

@@ -6,6 +6,10 @@ import { useReading } from '../context/ReadingContext';
 import { fetchSpreads } from '../api/client';
 import type { Spread, RecommendResponse } from '../types';
 
+interface LocationState {
+  recommendations?: RecommendResponse | null;
+}
+
 export default function RecommendPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,12 +19,13 @@ export default function RecommendPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const recs = (location.state as any)?.recommendations as RecommendResponse | null;
+    const state = location.state as LocationState | null;
+    const recs = state?.recommendations ?? null;
     setRecommendations(recs);
 
     fetchSpreads()
       .then(setAllSpreads)
-      .catch(() => setError('加载牌阵失败'));
+      .catch((err) => { console.error('Load spreads failed:', err); setError('加载牌阵失败'); });
   }, [location.state]);
 
   const handleSelect = (spread: Spread) => {
