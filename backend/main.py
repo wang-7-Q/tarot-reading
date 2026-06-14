@@ -1,8 +1,10 @@
 """Tarot Reading API — FastAPI application."""
 
 import json
+import logging
 import os
 import random
+import sys
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -17,8 +19,14 @@ from models.schemas import (
     Spread,
     TarotCard,
 )
-from services.recommend_engine import recommend_spreads
+from services.recommend_engine import recommend_spreads, KEYWORD_TAG_MAP
 from services.interpreter import interpret_with_claude
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -26,7 +34,9 @@ app = FastAPI(title="Tarot Reading API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=os.getenv(
+        "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -40,17 +50,38 @@ _cards_map: dict[str, dict] = {}
 _spreads_map: dict[str, dict] = {}
 
 
-def _load_data():
+def _load_data() -> None:
+    """Load cards and spreads from disk with validation."""
+    cards_path = DATA_DIR / "cards.json"
+    spreads_path = DATA_DIR / "spreads.json"
+
+    missing = [p for p in (cards_path, spreads_path) if not p.exists()]
+    if missing:
+        raise FileNotFoundError(f"Missing data files: {missing}")
+
+    with open(cards_path, "r", encoding="utf-8") as f:
+        cards = json.load(f)
+    with open(spreads_path, "r", encoding="utf-8") as f:
+        spreads = json.load(f)
+
+    card_ids = [c["id"] for c in cards]
+    dupes = {cid for cid in card_ids if card_ids.count(cid) > 1}
+    if dupes:
+        raise ValueError(f"Duplicate card IDs in cards.json: {dupes}")
+
     global _cards, _spreads, _cards_map, _spreads_map
-    with open(DATA_DIR / "cards.json", "r", encoding="utf-8") as f:
-        _cards = json.load(f)
-        _cards_map = {c["id"]: c for c in _cards}
-    with open(DATA_DIR / "spreads.json", "r", encoding="utf-8") as f:
-        _spreads = json.load(f)
-        _spreads_map = {s["id"]: s for s in _spreads}
+    _cards = cards
+    _spreads = spreads
+    _cards_map = {c["id"]: c for c in cards}
+    _spreads_map = {s["id"]: s for s in spreads}
+    logger.info("Loaded %d cards and %d spreads", len(cards), len(spreads))
 
 
-_load_data()
+try:
+    _load_data()
+except Exception as e:
+    logger.critical("Failed to load data: %s", e)
+    sys.exit(1)
 
 
 @app.get("/api/cards")
@@ -109,8 +140,10 @@ async def interpret(req: InterpretRequest) -> InterpretResponse:
             _cards_map,
         )
     except ValueError as e:
+        logger.error("Interpretation value error: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
+        logger.error("Claude API error: %s", e, exc_info=True)
         raise HTTPException(status_code=502, detail=f"Claude API error: {str(e)}")
 
     return InterpretResponse(**result)
@@ -124,6 +157,14 @@ async def draw_cards(spread_id: str, count: int | None = None):
         raise HTTPException(status_code=404, detail=f"Spread '{spread_id}' not found")
 
     n = count or spread["card_count"]
+    if n < 1:
+        raise HTTPException(status_code=400, detail=f"Count must be at least 1, got {n}")
+    if n > len(_cards):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Requested {n} cards but only {len(_cards)} available",
+        )
+
     drawn_indices = random.sample(range(len(_cards)), n)
     cards = []
     for i, idx in enumerate(drawn_indices):
@@ -137,9 +178,7 @@ async def draw_cards(spread_id: str, count: int | None = None):
 
 def _extract_keywords(question: str) -> list[str]:
     """Extract matching category keywords from the question."""
-    from services.recommend_engine import KEYWORD_TAG_MAP
-
-    found_tags = set()
+    found_tags: set[str] = set()
     for keyword, tags in KEYWORD_TAG_MAP.items():
         if keyword in question:
             found_tags.update(tags)
