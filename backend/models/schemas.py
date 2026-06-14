@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, field_validator
+from typing import Literal, Optional
 
 
 class Position(BaseModel):
@@ -16,12 +16,22 @@ class Spread(BaseModel):
     positions: list[Position]
     tags: list[str]
 
+    @field_validator("card_count")
+    @classmethod
+    def card_count_matches_positions(cls, v: int, info) -> int:
+        positions = info.data.get("positions")
+        if positions is not None and len(positions) != v:
+            raise ValueError(
+                f"card_count ({v}) does not match number of positions ({len(positions)})"
+            )
+        return v
+
 
 class TarotCard(BaseModel):
     id: str
     name_zh: str
     name_en: str
-    arcana: str
+    arcana: Literal["major", "minor"]
     suit: Optional[str] = None
     number: int
     keywords_upright: list[str]

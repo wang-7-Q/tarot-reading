@@ -590,7 +590,7 @@
     "suit": "swords",
     "number": 4,
     "keywords_upright": ["休息", "恢复", "沉思", "暂退", "疗愈"],
-    "keywords_reversed": ["躁动不安", "无法休息", "过度工作", "burnout"],
+    "keywords_reversed": ["躁动不安", "无法休息", "过度工作", "精力耗尽"],
     "description": "宝剑四描绘骑士静卧休憩的场景。正位呼唤暂停休息、恢复精力，逆位表示该休息而不肯休息导致精力耗尽。"
   },
   {
