@@ -1,0 +1,143 @@
+[
+  {
+    "id": "single-card",
+    "name_zh": "单张牌",
+    "description": "最简单的牌阵，抽取一张牌作为今日指引或对问题的直接回答。适合需要简单方向的时候。",
+    "card_count": 1,
+    "positions": [
+      {
+        "index": 0,
+        "label": "今日指引",
+        "meaning": "当前问题的核心指引或答案"
+      }
+    ],
+    "tags": ["通用", "快速"]
+  },
+  {
+    "id": "three-card",
+    "name_zh": "三张牌",
+    "description": "最经典的时间线牌阵，以过去、现在、未来三张牌揭示事情的发展脉络。适合大多数日常问题。",
+    "card_count": 3,
+    "positions": [
+      {
+        "index": 0,
+        "label": "过去",
+        "meaning": "影响当前局面的过往因素或根源"
+      },
+      {
+        "index": 1,
+        "label": "现在",
+        "meaning": "当前的真实状况或面临的挑战"
+      },
+      {
+        "index": 2,
+        "label": "未来",
+        "meaning": "按照当前趋势发展的可能结果"
+      }
+    ],
+    "tags": ["通用", "感情", "事业"]
+  },
+  {
+    "id": "relationship",
+    "name_zh": "关系牌阵",
+    "description": "专为感情和人际关系设计的七张牌阵，深度解析双方的动力、感受与未来走向。适合感情问题。",
+    "card_count": 7,
+    "positions": [
+      {
+        "index": 0,
+        "label": "你自己",
+        "meaning": "你在这段关系中的角色与状态"
+      },
+      {
+        "index": 1,
+        "label": "对方",
+        "meaning": "对方在这段关系中的角色与状态"
+      },
+      {
+        "index": 2,
+        "label": "关系现状",
+        "meaning": "你们之间当前的关系本质"
+      },
+      {
+        "index": 3,
+        "label": "你的感受",
+        "meaning": "你内心深处对这段关系的真实感受"
+      },
+      {
+        "index": 4,
+        "label": "对方的感受",
+        "meaning": "对方内心深处对这段关系的真实感受"
+      },
+      {
+        "index": 5,
+        "label": "障碍",
+        "meaning": "关系当前面临的主要挑战或阻碍"
+      },
+      {
+        "index": 6,
+        "label": "未来走向",
+        "meaning": "关系未来的可能发展方向"
+      }
+    ],
+    "tags": ["感情", "关系"]
+  },
+  {
+    "id": "celtic-cross",
+    "name_zh": "凯尔特十字",
+    "description": "塔罗中最全面深入的牌阵，十张牌全方位解析问题的各个维度。适合人生重大决策或深度自我探索。",
+    "card_count": 10,
+    "positions": [
+      {
+        "index": 0,
+        "label": "现状",
+        "meaning": "当前问题的核心本质与你的位置"
+      },
+      {
+        "index": 1,
+        "label": "障碍",
+        "meaning": "横在面前的直接挑战或阻力"
+      },
+      {
+        "index": 2,
+        "label": "过去",
+        "meaning": "问题的根源与过往基础"
+      },
+      {
+        "index": 3,
+        "label": "未来",
+        "meaning": "即将到来的近期发展"
+      },
+      {
+        "index": 4,
+        "label": "目标",
+        "meaning": "你内心真正追求的目标或最佳结果"
+      },
+      {
+        "index": 5,
+        "label": "基础",
+        "meaning": "支撑当前局面的潜意识或过往经历"
+      },
+      {
+        "index": 6,
+        "label": "自我",
+        "meaning": "你当下的态度与视角"
+      },
+      {
+        "index": 7,
+        "label": "环境",
+        "meaning": "外部环境与他人的影响"
+      },
+      {
+        "index": 8,
+        "label": "希望与恐惧",
+        "meaning": "你内心的希望或恐惧如何影响局面"
+      },
+      {
+        "index": 9,
+        "label": "结果",
+        "meaning": "按照当前路径发展的最终可能结果"
+      }
+    ],
+    "tags": ["通用", "深度", "事业"]
+  }
+]
