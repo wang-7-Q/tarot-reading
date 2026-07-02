@@ -8,19 +8,22 @@ interface Props {
 export default function SpreadLayout({ spread, children }: Props) {
   if (spread.id === 'single-card') {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        {children[0]}
+      <div className="spread-layout single-card">
+        <div className="spread-position">
+          {children[0]}
+          <span className="spread-position-label">{spread.positions[0].label}</span>
+        </div>
       </div>
     );
   }
 
   if (spread.id === 'three-card') {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 20, flexWrap: 'wrap' }}>
+      <div className="spread-layout three-card">
         {children.map((child, i) => (
-          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div key={i} className="spread-position">
             {child}
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-dim)' }}>
+            <span className="spread-position-label">
               {spread.positions[i].label}
             </span>
           </div>
@@ -38,21 +41,15 @@ export default function SpreadLayout({ spread, children }: Props) {
       { col: 2, row: 3 },
     ];
     return (
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 100px)',
-        gridTemplateRows: 'repeat(3, auto)',
-        gap: 16,
-        justifyContent: 'center',
-      }}>
+      <div className="spread-layout relationship">
         {children.map((child, i) => (
-          <div key={i} style={{
-            gridColumn: positions[i].col,
-            gridRow: positions[i].row,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-          }}>
+          <div
+            key={i}
+            className="spread-position"
+            style={{ gridColumn: positions[i].col, gridRow: positions[i].row }}
+          >
             {child}
-            <span style={{ fontSize: 11, color: 'var(--color-text-dim)', textAlign: 'center' }}>
+            <span className="spread-position-label">
               {spread.positions[i].label}
             </span>
           </div>
@@ -63,19 +60,11 @@ export default function SpreadLayout({ spread, children }: Props) {
 
   // Celtic Cross: grid layout
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(4, 100px)',
-      gridTemplateRows: 'repeat(4, auto)',
-      gap: 12,
-      justifyContent: 'center',
-    }}>
+    <div className="spread-layout celtic-cross">
       {children.map((child, i) => (
-        <div key={i} style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-        }}>
+        <div key={i} className="spread-position">
           {child}
-          <span style={{ fontSize: 10, color: 'var(--color-text-dim)', textAlign: 'center' }}>
+          <span className="spread-position-label">
             {spread.positions[i].label}
           </span>
         </div>

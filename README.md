@@ -1,123 +1,163 @@
-# 🃏 塔罗指引
+# 塔罗指引
 
-> 基于 AI 的塔罗牌占卜工具。输入你的问题，自动推荐最适合的牌阵，通过优雅的翻牌动画抽取塔罗牌，由大模型生成专业、温暖、有洞察力的解读。
+一个面向桌面端和手机端的 AI 塔罗牌解读网站。用户输入问题后，系统会推荐合适的牌阵，引导抽牌、翻牌，并调用 OpenAI 兼容接口生成完整解读。
 
-## ✨ 特点
+## 项目亮点
 
-- 🔮 **智能牌阵推荐** — 根据问题关键词自动匹配最合适的牌阵
-- 🎴 **78 张完整塔罗牌** — 22 张大阿尔卡纳 + 56 张小阿尔卡纳，全部含正逆位释义
-- 📊 **4 种经典牌阵** — 单张牌、三张牌、关系牌阵、凯尔特十字
-- 🤖 **AI 深度解读** — 不仅解读单张牌，更串联牌与牌之间的因果与能量流动
-- 🎬 **流畅动画** — 洗牌、抽牌、3D 翻牌动画，沉浸式体验
-- 🔌 **多 API 兼容** — 支持所有 OpenAI 兼容接口（DeepSeek、Agnes、OpenAI 等），改一行配置即可切换
+- 智能牌阵推荐：根据用户问题匹配更合适的塔罗牌阵。
+- 完整塔罗牌库：内置 78 张塔罗牌数据，包含正位、逆位关键词和牌义。
+- 沉浸式抽牌体验：包含洗牌、抽牌、翻牌和结果展示动画。
+- 牌面与文字同步展示：翻开牌后可直接看到牌名、正逆位、关键词和简短牌义。
+- AI 深度解读：结合问题、牌阵位置和抽出的牌生成整体叙事、单牌解读与行动建议。
+- 手机端可用：页面、按钮、牌阵布局和解读内容都做了响应式适配。
+- OpenAI 兼容：默认按 DeepSeek 配置，也可以切换到其他兼容 OpenAI API 的模型服务。
 
-## 🎯 预览
+## 使用流程
 
+```text
+输入问题 -> 推荐牌阵 -> 抽牌翻牌 -> 查看牌面说明 -> 生成 AI 解读
 ```
-首页输入问题 → AI 推荐牌阵 → 抽牌翻牌 → 获取深度解读
-     🃏              ✨              🌙              📖
+
+## 技术栈
+
+| 模块 | 技术 |
+| --- | --- |
+| 前端 | React 19, TypeScript, Vite |
+| 动画 | Framer Motion |
+| 路由 | React Router |
+| 后端 | FastAPI, Pydantic |
+| AI 接口 | OpenAI Python SDK，兼容 OpenAI 格式接口 |
+| 数据 | JSON 牌库与牌阵配置 |
+
+## 目录结构
+
+```text
+.
+├── backend/
+│   ├── main.py                 # FastAPI 入口
+│   ├── data/
+│   │   ├── cards.json          # 78 张塔罗牌数据
+│   │   └── spreads.json        # 牌阵定义
+│   ├── models/
+│   │   └── schemas.py          # 请求与响应模型
+│   ├── services/
+│   │   ├── recommend_engine.py # 牌阵推荐逻辑
+│   │   └── interpreter.py      # AI 解读逻辑
+│   └── tests/                  # 后端测试
+├── frontend/
+│   ├── src/
+│   │   ├── api/                # 前端 API 客户端
+│   │   ├── components/         # 页面组件
+│   │   ├── context/            # 占卜状态管理
+│   │   ├── pages/              # 首页、推荐、抽牌、解读页
+│   │   └── styles/             # 全局样式
+│   └── package.json
+└── README.md
 ```
 
-## 🚀 快速开始
+## 环境要求
 
-### 环境要求
+- Python 3.11 或更高版本
+- Node.js 18 或更高版本
+- 一个 OpenAI 兼容接口的 API Key
 
-- Python ≥ 3.11
-- Node.js ≥ 18
-- 一个 OpenAI 兼容的 API Key（推荐 [DeepSeek](https://platform.deepseek.com)，国内可直接访问）
+## 本地启动
 
-### 1. 安装
+### 1. 安装后端依赖
 
 ```bash
-# 后端
 cd backend
 pip install -r requirements.txt
+```
 
-# 前端
+### 2. 配置环境变量
+
+复制 `backend/.env.example` 为 `backend/.env`，然后填入自己的 API Key。
+
+```env
+DEEPSEEK_API_KEY=sk-your-api-key
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-chat
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+```
+
+### 3. 启动后端
+
+```bash
+cd backend
+python main.py
+```
+
+后端默认运行在：
+
+```text
+http://127.0.0.1:8000
+```
+
+### 4. 安装前端依赖
+
+```bash
 cd frontend
 npm install
 ```
 
-### 2. 配置
-
-将 `backend/.env.example` 复制为 `backend/.env`，填入你的 API Key：
-
-```env
-DEEPSEEK_API_KEY=sk-你的key
-DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-chat
-```
-
-### 3. 启动
+### 5. 启动前端
 
 ```bash
-# 终端 1 — 后端（http://127.0.0.1:8000）
-cd backend
-python main.py
-
-# 终端 2 — 前端（http://localhost:5173）
 cd frontend
 npm run dev
 ```
 
-浏览器打开 http://localhost:5173 即可使用。
+前端默认运行在：
 
-## 🔄 切换 API
-
-修改 `backend/.env` 中的三行变量，重启后端即可。支持所有 OpenAI 兼容接口：
-
-```env
-# DeepSeek（默认）
-DEEPSEEK_API_KEY=sk-你的key
-DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-chat
-
-# 其他兼容 API，例如：
-# DEEPSEEK_BASE_URL=https://api.openai.com
-# DEEPSEEK_MODEL=gpt-4o
+```text
+http://127.0.0.1:5173
 ```
 
-## 📊 牌阵
+## 后端接口
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/cards` | 获取全部塔罗牌 |
+| GET | `/api/spreads` | 获取全部牌阵 |
+| POST | `/api/recommend` | 根据问题推荐牌阵 |
+| GET | `/api/draw` | 按牌阵抽牌 |
+| POST | `/api/interpret` | 生成 AI 解读 |
+
+## 常用命令
+
+前端：
+
+```bash
+cd frontend
+npm run dev
+npm run build
+npm run lint
+```
+
+后端：
+
+```bash
+cd backend
+python main.py
+pytest
+```
+
+## 牌阵
 
 | 牌阵 | 张数 | 适用场景 |
-|------|------|----------|
-| 🔮 单张牌 | 1 | 每日指引、简单提问 |
-| ✨ 三张牌 | 3 | 过去·现在·未来，日常困惑 |
-| 💞 关系牌阵 | 7 | 感情走向、人际分析 |
-| 🌟 凯尔特十字 | 10 | 重大决策、深度探索 |
+| --- | --- | --- |
+| 单张牌 | 1 | 每日指引、快速提问 |
+| 三张牌 | 3 | 过去、现在、未来 |
+| 关系牌阵 | 7 | 感情关系、人际互动 |
+| 凯尔特十字 | 10 | 重大决策、深度探索 |
 
-## 🏗️ 技术栈
+## 注意事项
 
-| 层级 | 技术 |
-|------|------|
-| 前端 | React 19 + TypeScript + Vite |
-| 动画 | Framer Motion |
-| 后端 | Python FastAPI |
-| AI | OpenAI 兼容 SDK |
-| 数据 | 78 张牌 + 4 牌阵 JSON |
+- `.env` 文件包含密钥，不要提交到 GitHub。
+- 如果前端请求失败，先确认后端是否运行在 `127.0.0.1:8000`。
+- 如果 AI 解读失败，检查 `DEEPSEEK_API_KEY`、`DEEPSEEK_BASE_URL` 和 `DEEPSEEK_MODEL` 是否正确。
 
-## 📁 项目结构
-
-```
-├── backend/
-│   ├── main.py                 # FastAPI 入口，5 个端点
-│   ├── models/schemas.py       # Pydantic 数据模型
-│   ├── services/
-│   │   ├── recommend_engine.py # 关键词牌阵推荐
-│   │   └── interpreter.py      # AI 解读服务
-│   ├── data/
-│   │   ├── cards.json          # 78 张完整塔罗牌数据
-│   │   └── spreads.json        # 4 种牌阵定义
-│   └── tests/                  # 10 个测试
-├── frontend/src/
-│   ├── pages/                  # 4 个页面（首页/推荐/抽牌/解读）
-│   ├── components/             # 9 个组件（翻牌/牌阵/洗牌等）
-│   ├── context/                # React Context 状态管理
-│   ├── api/client.ts           # API 客户端
-│   └── styles/global.css       # 暗紫色主题
-└── docs/superpowers/           # 设计文档与实现计划
-```
-
-## 📄 License
+## License
 
 MIT

@@ -12,8 +12,8 @@ export default function NarrativeBlock({ narrative }: Props) {
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="card-surface card-glow"
     >
-      <h3 style={{ fontSize: 'var(--text-lg)', marginBottom: 12 }}>📖 整体叙事</h3>
-      <p style={{ lineHeight: 2, color: 'var(--color-text)', fontSize: 'var(--text-base)' }}>
+      <h3 className="reading-card-title">整体叙事</h3>
+      <p className="reading-text">
         {narrative.split('\n').map((line, i) => (
           <span key={i}>
             {line}

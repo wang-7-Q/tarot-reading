@@ -13,18 +13,18 @@ export default function GuidanceBlock({ guidance }: Props) {
       transition={{ duration: 0.4, delay: 0.6 }}
       className="card-surface"
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="guidance-grid">
         <div>
-          <h4 style={{ color: 'var(--color-positive)', marginBottom: 8 }}>✨ 关键指引</h4>
-          <ul style={{ paddingLeft: 20, lineHeight: 2 }}>
+          <h4 style={{ color: 'var(--color-positive)', marginBottom: 8 }}>关键指引</h4>
+          <ul className="guidance-list">
             {guidance.key_points.map((point, i) => (
               <li key={i} style={{ color: 'var(--color-text)' }}>{point}</li>
             ))}
           </ul>
         </div>
         <div>
-          <h4 style={{ color: 'var(--color-warning)', marginBottom: 8 }}>⚠️ 需要注意</h4>
-          <ul style={{ paddingLeft: 20, lineHeight: 2 }}>
+          <h4 style={{ color: 'var(--color-warning)', marginBottom: 8 }}>需要注意</h4>
+          <ul className="guidance-list">
             {guidance.cautions.map((caution, i) => (
               <li key={i} style={{ color: 'var(--color-text)' }}>{caution}</li>
             ))}

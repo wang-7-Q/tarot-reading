@@ -1,9 +1,9 @@
-"""Claude API integration for tarot interpretation."""
+"""DeepSeek API integration for tarot interpretation."""
 
 import json
 import logging
 import os
-from anthropic import AsyncAnthropic
+from openai import AsyncOpenAI
 
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def build_interpretation_prompt(
     drawn_cards: list[dict],
     cards_map: dict[str, dict],
 ) -> str:
-    """Build the Claude prompt for a tarot interpretation."""
+    """Build the prompt for a tarot interpretation."""
     sorted_cards = sorted(drawn_cards, key=lambda d: d["position_index"])
 
     cards_text = ""
@@ -73,13 +73,13 @@ def build_interpretation_prompt(
 
 
 def _extract_json(response_text: str) -> str:
-    """Extract JSON string from Claude response, handling markdown code fences."""
+    """Extract JSON string from response, handling markdown code fences."""
     json_start = response_text.find("```json")
     if json_start != -1:
         start = json_start + 7
         end = response_text.find("```", start)
         if end == -1:
-            raise ValueError("Malformed Claude response: unclosed JSON code block")
+            raise ValueError("Malformed response: unclosed JSON code block")
         return response_text[start:end].strip()
 
     code_start = response_text.find("```")
@@ -94,44 +94,56 @@ def _extract_json(response_text: str) -> str:
 def _validate_interpretation_result(result: dict) -> None:
     """Validate that the parsed JSON has the required structure."""
     if not isinstance(result, dict):
-        raise ValueError("Claude response is not a JSON object")
+        raise ValueError("Response is not a JSON object")
     for key in ("narrative", "individual", "guidance"):
         if key not in result:
-            raise ValueError(f"Claude response missing required key: '{key}'")
+            raise ValueError(f"Response missing required key: '{key}'")
     if not isinstance(result["individual"], list):
         raise ValueError("'individual' must be a list")
     if not isinstance(result["guidance"], dict):
         raise ValueError("'guidance' must be an object")
 
 
-async def interpret_with_claude(
+async def interpret_with_ai(
     question: str,
     spread: dict,
     drawn_cards: list[dict],
     cards_map: dict[str, dict],
     api_key: str | None = None,
+    base_url: str | None = None,
+    model: str | None = None,
 ) -> dict:
-    """Send interpretation request to Claude API."""
+    """Send interpretation request to AI API."""
     if api_key is None:
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
-        raise ValueError("ANTHROPIC_API_KEY environment variable is not set")
+        raise ValueError("DEEPSEEK_API_KEY environment variable is not set")
 
-    client = AsyncAnthropic(api_key=api_key)
+    if base_url is None:
+        base_url = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+    if model is None:
+        model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+
+    client = AsyncOpenAI(api_key=api_key, base_url=base_url)
     prompt = build_interpretation_prompt(question, spread, drawn_cards, cards_map)
 
-    message = await client.messages.create(
-        model="claude-sonnet-4-6",
+    response = await client.chat.completions.create(
+        model=model,
         max_tokens=2048,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": prompt}],
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
         timeout=30.0,
     )
 
-    response_text = message.content[0].text
+    response_text = response.choices[0].message.content or ""
     logger.info(
-        "Claude API response received",
-        extra={"response_length": len(response_text), "model": "claude-sonnet-4-6"},
+        "AI API response received",
+        extra={"response_length": len(response_text), "model": model},
+    )
+    logger.info(
+        "AI response (first 300 chars): %s", response_text[:300]
     )
 
     json_text = _extract_json(response_text)
@@ -139,7 +151,11 @@ async def interpret_with_claude(
     try:
         result = json.loads(json_text)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Claude returned invalid JSON: {e}")
+        logger.error(
+            "Failed to parse DeepSeek JSON. Response text (first 500 chars): %s",
+            response_text[:500],
+        )
+        raise ValueError(f"DeepSeek returned invalid JSON: {e}")
 
     _validate_interpretation_result(result)
 

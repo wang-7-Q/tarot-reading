@@ -20,7 +20,7 @@ from models.schemas import (
     TarotCard,
 )
 from services.recommend_engine import recommend_spreads, KEYWORD_TAG_MAP
-from services.interpreter import interpret_with_claude
+from services.interpreter import interpret_with_ai
 
 logging.basicConfig(
     level=logging.INFO,
@@ -34,9 +34,7 @@ app = FastAPI(title="Tarot Reading API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv(
-        "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
-    ).split(","),
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -133,20 +131,21 @@ async def interpret(req: InterpretRequest) -> InterpretResponse:
             )
 
     try:
-        result = await interpret_with_claude(
+        result = await interpret_with_ai(
             req.question,
             spread,
             [dc.model_dump() for dc in req.cards],
             _cards_map,
         )
+        logger.info("AI result keys: %s, individual count: %d", list(result.keys()), len(result.get("individual", [])))
+        response = InterpretResponse(**result)
+        return response
     except ValueError as e:
         logger.error("Interpretation value error: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
-        logger.error("Claude API error: %s", e, exc_info=True)
-        raise HTTPException(status_code=502, detail=f"Claude API error: {str(e)}")
-
-    return InterpretResponse(**result)
+        logger.error("AI API error: %s", e, exc_info=True)
+        raise HTTPException(status_code=502, detail=f"AI API error: {str(e)}")
 
 
 @app.get("/api/draw")

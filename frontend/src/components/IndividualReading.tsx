@@ -16,11 +16,11 @@ export default function IndividualReading({ reading, index }: Props) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.15 }}
     >
-      <div className="card-surface" onClick={() => setIsOpen(!isOpen)} style={{ cursor: 'pointer' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 28 }}>🃏</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div className="card-surface individual-card" onClick={() => setIsOpen(!isOpen)}>
+        <div className="individual-summary">
+          <div className="individual-icon">✧</div>
+          <div>
+            <div className="individual-title-row">
               <strong>
                 {reading.card.name_zh}
                 {reading.reversed && (
@@ -29,11 +29,11 @@ export default function IndividualReading({ reading, index }: Props) {
                   </span>
                 )}
               </strong>
-              <span style={{ color: 'var(--color-text-dim)', fontSize: 'var(--text-sm)' }}>
-                — {reading.position}
+              <span className="individual-position">
+                {reading.position}
               </span>
             </div>
-            <p style={{ color: 'var(--color-text-dim)', fontSize: 'var(--text-sm)', marginTop: 2 }}>
+            <p className="reading-preview">
               {reading.reading.slice(0, 80)}...
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function IndividualReading({ reading, index }: Props) {
               <div style={{
                 marginTop: 12, paddingTop: 12,
                 borderTop: '1px solid var(--color-border)',
-                lineHeight: 1.9, fontSize: 'var(--text-base)',
+                lineHeight: 1.95, fontSize: 'var(--text-base)',
               }}>
                 {reading.reading}
               </div>

@@ -11,9 +11,9 @@ import type {
 
 const API_BASE = 'http://localhost:8000/api';
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+async function request<T>(path: string, options?: RequestInit, timeoutMs = 15000): Promise<T> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       headers: { 'Content-Type': 'application/json' },
@@ -57,7 +57,7 @@ export async function interpretReading(
       spread_id: spreadId,
       cards,
     } as InterpretRequest),
-  });
+  }, 120000);  // 120s timeout for AI generation
 }
 
 export async function drawCards(
